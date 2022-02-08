@@ -7,7 +7,6 @@ resource "vultr_instance" "catrina" {
   plan              = var.plan
   region            = var.region
   reserved_ip_id    = vultr_reserved_ip.catrina.id
-  script_id         = vultr_startup_script.catrina.id
   tag               = var.tag
 
   provisioner "file" {
