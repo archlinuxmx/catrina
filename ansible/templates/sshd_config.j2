@@ -1,0 +1,25 @@
+AllowAgentForwarding no
+AllowStreamLocalForwarding no
+AllowTcpForwarding no
+AllowUsers {{ username }}
+AuthenticationMethods publickey password
+AuthorizedKeysFile .ssh/authorized_keys
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+ClientAliveCountMax 2
+ClientAliveInterval 300
+ClientAliveInterval 60
+HostbasedAcceptedAlgorithms ssh-ed25519
+HostbasedAcceptedKeyTypes ssh-ed25519
+KexAlgorithms curve25519-sha256
+LogLevel VERBOSE
+LoginGraceTime 30
+MACs hmac-sha2-512-etm@openssh.com
+MaxStartups 2
+PasswordAuthentication yes
+PermitRootLogin no
+PermitTunnel no
+Port {{ ssh_port }}
+StrictModes yes
+Subsystem sftp /usr/lib/ssh/sftp-server -f AUTHPRIV -l INFO
+SyslogFacility AUTH
+Banner /etc/ssh/banner

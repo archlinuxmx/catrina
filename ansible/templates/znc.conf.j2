@@ -1,0 +1,97 @@
+AnonIPLimit = 10
+AuthOnlyViaModule = false
+ConfigWriteDelay = 0
+ConnectDelay = 5
+HideVersion = true
+LoadModule = webadmin
+MaxBufferSize = 500
+ProtectWebSessions = true
+SSLCertFile = /var/lib/znc/znc.pem
+SSLDHParamFile = /var/lib/znc/znc.pem
+SSLKeyFile = /var/lib/znc/znc.pem
+ServerThrottle = 30
+Version = 1.8.2
+
+<Listener listener0>
+	AllowIRC = false
+	AllowWeb = true
+	IPv4 = true
+	IPv6 = true
+	Port = {{ znc_port }}
+	SSL = false
+	URIPrefix = /
+</Listener>
+
+<Listener listener1>
+	AllowIRC = true
+	AllowWeb = false
+	IPv4 = true
+  IPv6 = true
+	Port = 6697
+	SSL = true
+	URIPrefix = /
+</Listener>
+
+<User {{ username }}>
+	Admin = true
+	AltNick = {{ username }}_
+	AppendTimestamp = false
+	AuthOnlyViaModule = false
+	AutoClearChanBuffer = true
+	AutoClearQueryBuffer = true
+	ChanBufferSize = 50
+	DenyLoadMod = false
+	DenySetBindHost = false
+	Ident = {{ username }}
+	JoinTries = 10
+	LoadModule = chansaver
+	LoadModule = controlpanel
+	MaxJoins = 0
+	MaxNetworks = 1
+	MaxQueryBuffers = 50
+	MultiClients = true
+	Nick = {{ username }}
+	NoTrafficTimeout = 180
+	PrependTimestamp = true
+	QueryBufferSize = 50
+	QuitMsg = %znc%
+	RealName = {{ username }}
+	StatusPrefix = *
+	TimestampFormat = [%H:%M:%S]
+
+	<Network liberachat>
+		Encoding = ^UTF-8
+		FloodBurst = 9
+		FloodRate = 2.00
+		IRCConnectEnabled = true
+		JoinDelay = 0
+		LoadModule = cert
+		LoadModule = sasl
+		LoadModule = simple_away
+		LoadModule = clientbuffer
+		Server = 10.0.0.1 +6697
+		TrustAllCerts = false
+		TrustPKI = true
+	</Network>
+
+	<Network oftc>
+		Encoding = ^UTF-8
+		FloodBurst = 9
+		FloodRate = 2.00
+		IRCConnectEnabled = true
+		JoinDelay = 0
+		LoadModule = cert
+		LoadModule = clientbuffer
+		LoadModule = sasl
+		LoadModule = simple_away
+		Server = 10.0.0.2 +6697
+		TrustAllCerts = false
+		TrustPKI = true
+	</Network>
+
+	<Pass password>
+		Hash = {{ password_hash }}
+		Method = SHA256
+		Salt = {{ password_salt }}
+	</Pass>
+</User>

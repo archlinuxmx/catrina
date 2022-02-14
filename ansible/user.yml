@@ -1,0 +1,55 @@
+---
+- become: true
+  hosts: localhost
+  name: Create user
+
+  vars_files:
+  - vars/variables.json
+
+  tasks:
+  - name: Ensure the user is created
+    ansible.builtin.user:
+      name: "{{ username }}"
+      groups:
+        - docker
+        - tor
+        - znc
+      append: true
+
+  - name: Ensure the user has sudo access
+    ansible.builtin.lineinfile:
+      path: "/etc/sudoers.d/{{ username }}"
+      line: "{{ username }}  ALL=(ALL)   ALL"
+      create: true
+
+  - name: Ensure the SSH directory exists
+    ansible.builtin.file:
+      path: "/home/{{ username }}/.ssh/"
+      owner: "{{ username }}"
+      state: directory
+      mode: "u=rwx"
+
+  - name: Ensure my public SSH keys are added to the user
+    ansible.posix.authorized_key:
+      user: "{{ username }}"
+      state: present
+      key: "{{ public_ssh_keys_url }}"
+
+  - name: Validate if the user has a password
+    ansible.builtin.shell: >
+      passwd --status {{ username }}
+      | awk '{print $2}'
+    register: password_status
+
+  - name: Ensure the user password is disabled and expired
+    ansible.builtin.shell: "{{ item }}"
+    loop:
+      - passwd --delete {{ username }}
+      - passwd --expire {{ username }}
+    when: password_status.stdout != "P"
+
+  - name: Ensure the root user is disabled
+    ansible.builtin.user:
+      name: root
+      password_lock: true
+      shell: /bin/nologin

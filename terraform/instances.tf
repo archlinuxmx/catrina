@@ -9,6 +9,10 @@ resource "vultr_instance" "catrina" {
   reserved_ip_id    = vultr_reserved_ip.catrina.id
   tag               = var.tag
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   provisioner "file" {
     source      = "../ansible"
     destination = "/tmp"
@@ -29,6 +33,25 @@ resource "vultr_instance" "catrina" {
       "reflector --country us,mx --latest 15 --protocol https --sort rate --save /etc/pacman.d/mirrorlist --verbose",
       "pacman -Su --noconfirm",
       "pacman -S ansible --noconfirm",
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = vultr_instance.catrina.default_password
+      host     = self.main_ip
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "ansible-galaxy collection install --requirements-file /tmp/ansible/requirements.yml",
+      "ansible-playbook /tmp/ansible/packages.yml",
+      "ansible-playbook /tmp/ansible/firewall.yml",
+      "ansible-playbook /tmp/ansible/user.yml",
+      "ansible-playbook /tmp/ansible/ssh.yml",
+      "ansible-playbook /tmp/ansible/tor.yml",
+      "ansible-playbook /tmp/ansible/znc.yml",
     ]
 
     connection {

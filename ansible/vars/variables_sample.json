@@ -1,0 +1,15 @@
+{
+    "grafana_password": "",
+    "grafana_port": "3000",
+    "irc_port": "6697",
+    "password_hash": "",
+    "password_salt": "",
+    "prometheus_node_exporter_port": "9100",
+    "prometheus_port": "9090",
+    "public_ssh_keys_url": "",
+    "ssh_port": "",
+    "tor_contact_info": "",
+    "tor_nickname": "",
+    "username": "",
+    "znc_port": ""
+}

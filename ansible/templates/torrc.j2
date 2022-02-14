@@ -1,0 +1,22 @@
+AccountingMax 3 TBytes
+ContactInfo {{ tor_contact_info }}
+ControlPort 9051
+CookieAuthFile /var/lib/tor/control_auth_cookie
+CookieAuthFileGroupReadable 1
+CookieAuthentication 1
+DataDirectory /var/lib/tor
+DataDirectoryGroupReadable 1
+HiddenServiceAuthorizeClient stealth hidden_service
+HiddenServiceDir /var/lib/tor/hidden_service
+HiddenServicePort {{ grafana_port }} 127.0.0.1:{{ grafana_port }}
+HiddenServicePort {{ prometheus_node_exporter_port }} 127.0.0.1:{{ prometheus_node_exporter_port }}
+HiddenServicePort {{ prometheus_port }} 127.0.0.1:{{ prometheus_port}}
+HiddenServicePort {{ znc_port }} 127.0.0.1:{{ znc_port }}
+Log notice syslog
+MapAddress 10.0.0.1 libera75jm6of4wxpxt4aynol3xjmbtxgfyjpu34ss4d7r7q2v5zrpyd.onion
+MapAddress 10.0.0.2 irc.oftc.net
+Nickname {{ tor_nickname }}
+ORPort 9001
+RelayBandwidthBurst 350 MBytes
+RelayBandwidthRate 300 MBytes
+User tor

@@ -1,0 +1,44 @@
+---
+- become: true
+  hosts: localhost
+  name: Configure firewall
+
+  vars_files:
+  - vars/variables.json
+
+  tasks:
+  - name: Ensure UFW is enabled, rejecting all traffic, and logging.
+    community.general.ufw:
+      state: enabled
+      policy: reject
+      logging: 'on'
+
+  - name: Ensure the custom SSH port is open
+    community.general.ufw:
+      rule: allow
+      port: "{{ ssh_port }}"
+      comment: "SSH Port"
+      proto: tcp
+    notify: Restart UFW
+
+  - name: Ensure the IRC port is open
+    community.general.ufw:
+      rule: allow
+      port: "{{ irc_port }}"
+      comment: "IRC Port"
+      proto: tcp
+    notify: Restart UFW
+
+  - name: Ensure the UFW daemon is enabled and running
+    ansible.builtin.systemd:
+      name: ufw
+      enabled: true
+      state: started
+
+  handlers:
+    - name: Restart UFW
+      ansible.builtin.systemd:
+        name: ufw
+        enabled: true
+        state: restarted
+        daemon_reload: true

@@ -1,0 +1,64 @@
+---
+- name: Install packages
+  hosts: localhost
+  become: true
+
+  tasks:
+  - name: Ensure the list of dependencies is fulfilled
+    ansible.builtin.pacman:
+      name:
+        - docker
+        - emacs-nox
+        - grafana
+        - htop
+        - nyx
+        - prometheus
+        - prometheus-node-exporter
+        - proxychains-ng
+        - reflector
+        - tmux
+        - tor
+        - torsocks
+        - ufw
+        - znc
+        - znc-clientbuffer
+      state: present
+
+  - name: Ensure the reflector configuration is in place
+    ansible.builtin.copy:
+      src: files/reflector.conf
+      dest: /etc/xdg/reflector/reflector.conf
+    notify: Restart reflector
+
+  - name: Ensure the prometheus configuration is in place
+    ansible.builtin.copy:
+      src: files/prometheus.yml
+      dest: /etc/prometheus/prometheus.yml
+    notify: Restart prometheus
+
+  - name: Ensure services are enabled and running
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      enabled: true
+      state: started
+    loop:
+      - docker
+      - grafana
+      - prometheus
+      - prometheus-node-exporter
+      - reflector
+
+  handlers:
+    - name: Restart reflector
+      ansible.builtin.systemd:
+        name: reflector
+        daemon_reload: true
+        enabled: true
+        state: restarted
+
+    - name: Restart prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        daemon_reload: true
+        enabled: true
+        state: restarted

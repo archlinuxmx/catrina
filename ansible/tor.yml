@@ -1,0 +1,42 @@
+---
+- become: true
+  hosts: localhost
+  name: Install Tor
+
+  vars_files:
+  - vars/variables.json
+
+  tasks:
+  - name: Ensure the Tor configuration directory exists
+    ansible.builtin.file:
+      path: /etc/tor/
+      state: directory
+
+  - name: Ensure the Tor configuration is in place
+    ansible.builtin.template:
+      src: templates/torrc.j2
+      dest: /etc/tor/torrc
+    notify: Restart tor
+
+  - name: Ensure the Tor daemon is enabled and running
+    ansible.builtin.systemd:
+      name: tor
+      enabled: true
+      state: started
+
+  - name: Ensure Tor's Onion address is retrieved
+    ansible.builtin.shell: >
+      cat /var/lib/tor/hidden_service/hostname
+    register: hidden_service
+
+  - name: Ensure Tor's Onion address is printed
+    ansible.builtin.debug:
+      var: hidden_service.stdout_lines
+
+  handlers:
+    - name: Restart tor
+      ansible.builtin.systemd:
+        name: tor
+        enabled: true
+        state: restarted
+        daemon_reload: true
