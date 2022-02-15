@@ -11,11 +11,20 @@
     ansible.builtin.file:
       path: /etc/tor/
       state: directory
+      recurse: true
+      owner: tor
+      group: tor
+
+  - name: Validate if there is a Tor config file
+    ansible.builtin.stat:
+      path: /etc/tor/torrc
+    register: tor_config
 
   - name: Ensure the Tor configuration is in place
     ansible.builtin.template:
       src: templates/torrc.j2
       dest: /etc/tor/torrc
+    when: tor_config.stat.exists == false
     notify: Restart tor
 
   - name: Ensure the Tor daemon is enabled and running

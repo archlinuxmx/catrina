@@ -37,7 +37,7 @@
           dest: /var/lib/znc/configs/znc.conf
           owner: znc
           group: znc
-        when: not znc_config.stat.exists
+        when: znc_config.stat.exists == false
         notify: Restart ZNC
 
       - name: Validate if there is a ZNC certificate
@@ -50,7 +50,7 @@
         ansible.builtin.shell: znc --makepem --datadir /var/lib/znc
         args:
           creates: /var/lib/znc/znc.pem
-        when: not znc_certificate.stat.exists
+        when: znc_certificate.stat.exists == false
         notify: Restart ZNC
 
       - name: Ensure the ZNC fingerprint is registered
@@ -92,11 +92,10 @@
       - name: Ensure the LiberaChat network user certificate is generated
         ansible.builtin.shell: >
           openssl req -x509 -new -newkey rsa:4096 -sha256 -days 1096 -nodes
-          -out user.pem -keyout user.pem -subj "/CN={{ username }}"
+          -out user.pem -keyout user.pem -subj "/CN={{ server_url }}"
         args:
-          chdir: "{{ liberachat_dir }}/moddata/cert/"
-          creates: "{{ liberachat_dir }}/moddata/cert/user.pem"
-        when: not liberachat_certificate.stat.exists
+          chdir: "{{ liberachat_dir }}/moddata/cert"
+        when: liberachat_certificate.stat.exists == false
         notify: Restart ZNC
 
       - name: Ensure ZNC has access to the LiberaChat certificate
@@ -111,7 +110,7 @@
           openssl x509 -in user.pem -noout -fingerprint -sha512
           | awk -F= '{gsub(":",""); print tolower ($2)}'
         args:
-          chdir: "{{ liberachat_dir }}/moddata/cert/"
+          chdir: "{{ liberachat_dir }}/moddata/cert"
         register: liberachat_fingerprint
 
   - name: Ensure the OFTC network is configured
@@ -133,11 +132,10 @@
       - name: Ensure the OFTC network user certificate is generated
         ansible.builtin.shell: >
           openssl req -nodes -newkey rsa:4096 -keyout user.pem -x509 -days 3650
-          -out user.pem -subj "/CN={{ username }}"
+          -out user.pem -subj "/CN={{ server_url }}"
         args:
-          chdir: "{{ oftc_dir }}/moddata/cert/"
-          creates: "{{ oftc_dir }}/moddata/cert/user.pem"
-        when: not oftc_certificate.stat.exists
+          chdir: "{{ oftc_dir }}/moddata/cert"
+        when: oftc_certificate.stat.exists == false
         notify: Restart ZNC
 
       - name: Ensure ZNC has access to the OFTC certificate
@@ -152,7 +150,7 @@
           openssl x509 -sha1 -noout -fingerprint -in user.pem
           | sed -e 's/^.*=//;s/://g;y/ABCDEF/abcdef/'
         args:
-          chdir: "{{ oftc_dir }}/moddata/cert/"
+          chdir: "{{ oftc_dir }}/moddata/cert"
         register: oftc_fingerprint
 
   - name: Ensure the ZNC daemon is enabled and running
