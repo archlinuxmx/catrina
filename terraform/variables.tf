@@ -42,13 +42,13 @@ variable "tag" {
 ############
 # firewall #
 ############
-variable "default_ssh_port" {
-  default = "22"
+variable "irc_port" {
+  default = "6697"
   type    = string
 }
 
-variable "irc_port" {
-  default = "6697"
+variable "tor_port" {
+  default = "9001"
   type    = string
 }
 

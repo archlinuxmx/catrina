@@ -21,6 +21,14 @@
       proto: tcp
     notify: Restart UFW
 
+  - name: Ensure the Tor ORPort port is open
+    community.general.ufw:
+      rule: allow
+      port: "{{ tor_port }}"
+      comment: "Tor Port"
+      proto: tcp
+    notify: Restart UFW
+
   - name: Ensure the IRC port is open
     community.general.ufw:
       rule: allow
